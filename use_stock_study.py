@@ -46,17 +46,37 @@ from stock_study import stock_study
 # now.strftime('%Y-%m-%d')
 #delta = datetime.timedelta(days = 60)
 #ndays = now - delta
-
 portfolios = ['600895','002405']
 for stock_code in portfolios:
-   s = stock_study(stock_code)
+   s = stock_study(stock_code,100)
    s.initial_df(1,"D")
    s.initial_extream_point(1)
    s.plot_trend()
-   print("max 1 is "+str(s.maxidx)+" max2 is "+str(s.maxidx2))
-   print("min 1 is "+str(s.minidx)+" min2 is "+str(s.minidx2))
+   s.macd_analysis(1)
+   s.check_ene()
+#   print("max 1 is "+str(s.maxidx)+" max2 is "+str(s.maxidx2))
+#   print("min 1 is "+str(s.minidx)+" min2 is "+str(s.minidx2))
    s.show_plt()
+stock_basics = ts.get_stock_basics() 
 
+# ---------------------------------------------------------
+# parse the our stocks
+# -------------------------------------
+portfolios_monitor = ['600895','002405','002594','300024','002230'      ,'601633',       '002185', '002456','300115','600016','600000','300059','600584']
+
+for stock_code in portfolios_monitor:
+     s = stock_study(stock_code,60)
+     s.initial_df(0,"D")
+     if(s.initial_extream_point(0)):
+         s.initial_df(1,"D") 
+         s.initial_extream_point(1) 
+         s.macd_analysis(1)
+         s.show_plt()
+#     s.macd_analysis()
+     if(s.check_ene()):
+          print("the stock " + str(stock_code) +" ene is break, maybe we could do some investigate about it") 
+	# ene and macd beili
+	# fib
 # for code in stock_basics.index:
 # 	if check_ene(code):
 # 		if stock_basics['pe'][code] < 50:
@@ -65,3 +85,58 @@ for stock_code in portfolios:
 # 		if stock_basics['outstanding'][code] < 20000:
 # 			print (str(code)+" stock fluent totals is not big") ;
 # 
+# -----------------------------------------------------------------
+#  vol filter
+# -----------------------------------------------------------------
+a_vollist = []
+for code in stock_basics.index:
+        s = stock_study(code,20)
+        s.initial_df(0,"D")
+        print (str(code)+" stock is under parsing") 
+        if(s.check_vol()):
+            print("the stock " + str(code) +" vol is break, maybe we could do some investigate about it") 
+            a_vollist.append(code)
+            if stock_basics['pe'][code] < 50:
+                if stock_basics['pe'][code] != 0:
+                    print (str(code)+" stock pe is low") 
+                if stock_basics['outstanding'][code] < 20000:
+                    print (str(code)+" stock fluent totals is not big") ;
+
+print(a_vollist) 
+# -----------------------------------------------------------------
+#  trend and macd beili filter
+# -----------------------------------------------------------------
+a_macdtrendlist = []
+for code in stock_basics.index:
+        print (str(code)+" stock is under parsing") 
+        s = stock_study(code,100)
+        s.initial_df(0,"D")
+        if(s.initial_extream_point(0)):
+           if(s.macd_analysis(0)):
+               a_enelist.append(code)
+               if stock_basics['pe'][code] < 50:
+                   if stock_basics['pe'][code] != 0:
+                       print (str(code)+" stock pe is low") 
+                   if stock_basics['outstanding'][code] < 20000:
+                       print (str(code)+" stock fluent totals is not big") ;
+print(a_macdtrendlist) 
+
+
+# -----------------------------------------------------------------
+#  ene filter
+# -----------------------------------------------------------------
+a_enelist = []
+for code in stock_basics.index:
+        s = stock_study(code,20)
+        s.initial_df(0,"D")
+        print (str(code)+" stock is under parsing") 
+        if(s.check_ene()):
+            print("the stock " + str(code) +" ene is break, maybe we could do some investigate about it") 
+            a_enelist.append(code)
+            if stock_basics['pe'][code] < 50:
+                if stock_basics['pe'][code] != 0:
+                    print (str(code)+" stock pe is low") 
+                if stock_basics['outstanding'][code] < 20000:
+                    print (str(code)+" stock fluent totals is not big") ;
+
+print(a_enelist) 
