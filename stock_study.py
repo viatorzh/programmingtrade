@@ -41,12 +41,14 @@ class stock_study:
         now = datetime.datetime.now()
         # now.strftime('%Y-%m-%d')
         delta = datetime.timedelta(days = self.period)
-#        delta = datetime.timedelta(days = 60)
+   #    delta = datetime.timedelta(days = 60)
         ndays = now - delta
-#       fuquan data        
-        dff = ts.get_h_data(self.code,start=ndays.strftime('%Y-%m-%d'))
+   #    fuquan data        
+        if(k_type == "D"):
+           dff = ts.get_h_data(self.code,start=ndays.strftime('%Y-%m-%d'))
+        else:
 #        no fuquan data        
-        #dff = ts.get_hist_data(self.code,start=ndays.strftime('%Y-%m-%d'),ktype=k_type)
+           dff = ts.get_hist_data(self.code,start=ndays.strftime('%Y-%m-%d'),ktype="W")
         self.df = dff[::-1] 
         if plot != 0:
              ma5  = ta.MA(np.array(self.df['close']),5,matype=0)
@@ -73,10 +75,11 @@ class stock_study:
 
     def initial_extream_point(self,plot):
 #         print(self.df['close'].count()) ;
-         if self.df['close'].count() < 40:
+         total_cnt = self.df['close'].count() 
+         if total_cnt < 20:
             return False
-         maxidx = self.df['close'][30:].idxmax(axis=1)
-         minidx = self.df['close'][30:].idxmin(axis=1)
+         maxidx = self.df['close'].idxmax(axis=1)
+         minidx = self.df['close'].idxmin(axis=1)
          #now = datetime.datetime.now()
          # now.strftime('%Y-%m-%d')
          #detla = datetime.timedelta(days = 120)
@@ -91,6 +94,8 @@ class stock_study:
             minidx2 = self.df['close'][maxidx:].idxmin(axis=1) ;
             maxidx2 = self.df['close'][:minidx].idxmax(axis=1) ;
             idx_diff = maxcnt - mincnt + 1 
+            if maxcnt < total_cnt * 0.4:
+                maxidx2 = self.df['close'][minidx2:].idxmax(axis=1) ;
             if price_diff > self.df['close'][-1] * 0.1:
                 second_max_idx = minidx 
                 second_min_idx = maxidx
@@ -112,6 +117,8 @@ class stock_study:
             idx_diff = mincnt - maxcnt + 1 
             maxidx2 = self.df['close'][minidx:].idxmax(axis=1) ;
             minidx2 = self.df['close'][:maxidx].idxmin(axis=1) ;
+            if mincnt < total_cnt * 0.4:
+                minidx2 = self.df['close'][maxidx2:].idxmax(axis=1) ;
             if price_diff > self.df['close'][-1] * 0.1:
                 second_max_idx = minidx 
                 second_min_idx = maxidx
@@ -128,8 +135,9 @@ class stock_study:
                                        self.find_trend = True
                                        break
          if plot != 0:
-              self.ax0.plot([self.df['close'][:minidx].count(),self.df['close'].count()],[self.df['close'][maxidx]-price_diff*0.618,self.df['close'][maxidx]-price_diff*0.618],'b--') ;
-              self.ax0.plot([self.df['close'][:minidx].count(),self.df['close'].count()],[self.df['close'][maxidx]-price_diff*0.382,self.df['close'][maxidx]-price_diff*0.382],'b--') ;
+            self.ax0.plot([self.df['close'][:minidx].count(),self.df['close'].count()],[self.df['close'][maxidx]-price_diff*0.618,self.df['close'][maxidx]-price_diff*0.618],'b--') ;
+            self.ax0.plot([self.df['close'][:minidx].count(),self.df['close'].count()],[self.df['close'][maxidx]-price_diff*0.382,self.df['close'][maxidx]-price_diff*0.382],'b--') ;
+            self.ax0.plot([self.df['close'][:minidx].count(),self.df['close'][:maxidx].count()],[self.df['close'][minidx],self.df['close'][maxidx]],'r-') 
          
          self.maxidx = maxidx 
          self.minidx = minidx 
@@ -141,12 +149,33 @@ class stock_study:
            return False
 
     
+    def check_week_k(self):
+       print("start weekly k parse"+str(self.df['close'].count())) 
+       if(self.df['close'].count() < 20):
+            return False 
+       if(self.minidx < self.minidx2):
+            y2 = self.df['close'][self.minidx2] 
+            y1 = self.df['close'][self.minidx] 
+            x2 = self.df['close'][:self.minidx2].count() 
+            x1 = self.df['close'][:self.minidx].count() 
+            a = (y2 - y1)/(x2 - x1) ;
+            b = (y1*x2 - x1*y2)/(x2 - x1) ;
+            yy = a * self.df['close'].count() + b ;
+            if((self.df['low'][-1] < yy and self.df['high'][-1] > yy) or (self.df['low'][-2] < yy and self.df['high'][-2] > yy)):
+                return True 
+            return False 
+	    
 
     def plot_trend(self):
 #        if self.find_trend:
+        y2 = self.df['close'][self.minidx2] 
+        y1 = self.df['close'][self.minidx] 
+        x2 = self.df['close'][:self.minidx2].count() 
+        x1 = self.df['close'][:self.minidx].count() 
+        a = (y2 - y1)/(x2 - x1) ;
+        b = (y1*x2 - x1*y2)/(x2 - x1) ;
         self.ax0.plot([self.df['close'][:self.maxidx].count(),self.df['close'][:self.maxidx2].count()],[self.df['close'][self.maxidx],self.df['close'][self.maxidx2]],'--')
-        self.ax0.plot([self.df['close'][:self.minidx].count(),self.df['close'][:self.minidx2].count()],[self.df['close'][self.minidx],self.df['close'][self.minidx2]],'--') 
-        self.ax0.plot([self.df['close'][:self.minidx].count(),self.df['close'][:self.maxidx].count()],[self.df['close'][self.minidx],self.df['close'][self.maxidx]],'r-') 
+        self.ax0.plot([1,self.df['close'].count()],[a+b,a*self.df['close'].count()+b],'--') 
 
     def macd_analysis(self,plot):
         macd,macdsignal,macdhist = ta.MACD(np.array(self.df['close']), fastperiod = 12,slowperiod = 26 , signalperiod = 9)
@@ -183,6 +212,21 @@ class stock_study:
         plt.title(str(self.code)+ " analysis")
         plt.show()
 
+
+#check if it is the real time k reverse
+    def check_kpattern(self):
+        N = 20
+        volma = ta.MA(np.array(self.df['volume']),N,matype=0)
+        threshold = volma[-1] * 1.5 
+        if self.df['volume'].count() < 5:
+           return False
+        if self.df['close'][-1] < self.df['open'][-1]:
+           if self.df['close'][-1] < self.df['open'][-2] and self.df['open'][-1] > self.df['close'][-2]:
+              return -1
+        if self.df['close'][-1] > self.df['open'][-1]:
+           if self.df['close'][-1] > self.df['open'][-2] and self.df['open'][-1] < self.df['close'][-2]:
+              return 1
+        return False
 
     def check_vol(self):
         N = 20
