@@ -147,8 +147,8 @@ def wave_select():
     
     print(a_wavelist) 
 
-def deep_study(code):
-     s = stock_study(code,100)
+def deep_study(code,basic_df):
+     s = stock_study(code,200)
      s.initial_df(1,"D") 
      print (str(code)+" stock is under wave analysis") 
      if s.initial_extream_point(1): 
@@ -160,6 +160,8 @@ def deep_study(code):
      s.macd_analysis(1)
      print (str(code)+" stock is plotting itself") 
      s.show_plt()
+     s.generate_training_data(basic_df)
+     print (str(code)+" stock is training data is generated!") 
 
 def week_trend():
     print("start to week trend analyze stocks") 
@@ -203,81 +205,16 @@ def week_trend():
     
     print(a_weektrend) 
 
-def buy_analysis():
-    print("--------------------------------------------------------------------") 
-    print("start to parse if the stock in the pool has the potential to be buy") 
-    print("--------------------------------------------------------------------") 
-    for code in stock_pool:
-        try:
-            print (str(code)+" stock is under parsing") 
-            s = stock_study(code,300)
-            s.initial_df(0,"D")
-            s.initial_extream_point(0)
-            if(s.check_ene()):
-                print("the stock " + str(code) +" ene break, we could buy some positions") 
-#                a_weektrend.append(code)
-            
-            s.initial_df(0,"W")
-            s.initial_extream_point(0)
-            if(s.check_week_k()):
-                print("the stock " + str(code) +" week level k is at resistance place, we could buy some positions") 
-                s.initial_df(1,"W")
-                s.initial_extream_point(1)
-                s.plot_trend()
-                s.macd_analysis()
-                s.show_plt()
-        except:
-            traceback.print_exc()
-            pass
-    
-    for code in sm_pool:
-        try:
-            print (str(code)+" stock is under parsing") 
-            s = stock_study(code,300)
-            s.initial_df(0,"W")
-            s.initial_extream_point(0)
-            if(s.check_week_k()):
-                print("the stock " + str(code) +" wave matches model, we could do some investigate about it") 
-                a_weektrend.append(code)
-        except:
-            traceback.print_exc()
-            pass
-    for code in a_concept_list:
-        try:
-            print (str(code)+" stock is under parsing") 
-            s = stock_study(code,300)
-            s.initial_df(0,"W")
-            s.initial_extream_point(0)
-            if(s.check_week_k()):
-                print("the stock " + str(code) +" wave matches model, we could do some investigate about it") 
-                a_weektrend.append(code)
-        except:
-            traceback.print_exc()
-            pass
-    
-    print(a_weektrend) 
 
 portfolios_monitor = ['600895','002405','002594','300024','002230'      ,'601633',       '002185', '002456','300115','600016','600000','300059','600584']
-portfolios_monitor = ['sh','600895','002405','002594','300024','002230'      ,'601633',       '002185', '002456','300115','600016','600000','300059','600584']
-portfolios_monitor = ['sh','600895','002405','002456','300024','002230'      ,'601633',       '002185', '002594','300115','600016','600000','300059','600584']
-
-
+#portfolios_monitor = ['sh','600895','002405','002594','300024','002230'      ,'601633',       '002185', '002456','300115','600016','600000','300059','600584']
+#portfolios_monitor = ['600895']
 if __name__=="__main__":
+     basic_df = ts.get_stock_basics()
      for stock_code in portfolios_monitor:
         try:
            print (str(stock_code)+" stock is under deep parsing") 
-           deep_study(stock_code)
+           deep_study(stock_code,basic_df)
         except:
            traceback.print_exc()
            pass
-     startup_pool = []
-     sm_pool= []
-     a_enelist = []
-     a_wavelist = []
-     a_weektrend = []
-     a_concept_list = []
-     initial_pool() 
-#     ene_select()
-     wave_select()
-     week_trend()
-

@@ -28,6 +28,7 @@ from matplotlib import gridspec
 from matplotlib.mlab import csv2rec
 from matplotlib.dates import num2date, date2num, IndexDateFormatter
 from matplotlib.ticker import  IndexLocator, FuncFormatter
+#with PdfPages('foo.pdf') as pdf
 
 class stock_study:
     def __init__(self,code,period):
@@ -45,7 +46,10 @@ class stock_study:
         ndays = now - delta
    #    fuquan data        
         if(k_type == "D"):
-           dff = ts.get_h_data(self.code,start=ndays.strftime('%Y-%m-%d'))
+           if(self.code == "sh" or self.code == "sz"):
+             dff = ts.get_hist_data(self.code,start=ndays.strftime('%Y-%m-%d'))
+           else:
+             dff = ts.get_h_data(self.code,start=ndays.strftime('%Y-%m-%d'))
         else:
 #        no fuquan data        
            dff = ts.get_hist_data(self.code,start=ndays.strftime('%Y-%m-%d'),ktype="W")
@@ -93,47 +97,69 @@ class stock_study:
          if maxidx > minidx :
             minidx2 = self.df['close'][maxidx:].idxmin(axis=1) ;
             maxidx2 = self.df['close'][:minidx].idxmax(axis=1) ;
+            print ("- min index 0 1 is "+str( self.df['close'][:minidx].count())+" "+str( self.df['close'][:minidx2].count())+" min price0/1 is "+"max idx 0 1 is "+(str(self.df['close'][:maxidx].count()))+" "+(str(self.df['close'][:maxidx2].count())))  
             idx_diff = maxcnt - mincnt + 1 
+	    # in case the wave trend is very very narrow
             if maxcnt < total_cnt * 0.4:
                 maxidx2 = self.df['close'][minidx2:].idxmax(axis=1) ;
+                print ("-- min index 0 1 is "+str( self.df['close'][:minidx].count())+" "+str( self.df['close'][:minidx2].count())+" min price0/1 is "+"max idx 0 1 is "+(str(self.df['close'][:maxidx].count()))+" "+(str(self.df['close'][:maxidx2].count())))  
+            if mincnt >  total_cnt * 0.7:
+                minidx2 = self.df['close'][:maxidx2].idxmax(axis=1) ;
+                print ("-- min index 0 1 is "+str( self.df['close'][:minidx].count())+" "+str( self.df['close'][:minidx2].count())+" min price0/1 is "+"max idx 0 1 is "+(str(self.df['close'][:maxidx].count()))+" "+(str(self.df['close'][:maxidx2].count())))  
+
             if price_diff > self.df['close'][-1] * 0.1:
                 second_max_idx = minidx 
                 second_min_idx = maxidx
                #for idx in range(minidx:maxidx):
 	       # here i want to find the sub wave between the main wave which i can draw the trend line
                 for idx in self.df.index[mincnt:maxcnt]:
-                       if self.df['close'][idx] - self.df['close'][minidx] > price_diff * 0.2 :
+                       if self.df['close'][idx] - self.df['close'][minidx] > price_diff * 0.3 and second_min_idx == maxidx :
                                second_max_idx = idx 
-                       if self.df['close'][second_max_idx] - self.df['close'][idx] > price_diff * 0.2 :
+                       if self.df['close'][second_max_idx] - self.df['close'][idx] > price_diff * 0.3 :
+                            if self.df['close'][second_min_idx] > self.df['close'][idx] :
                                second_min_idx = idx 
                        if second_min_idx != maxidx:
                                if self.df['close'][idx] > self.df['close'][second_max_idx]:
                                        maxidx2 = second_max_idx
                                        minidx2 = second_min_idx
                                        self.find_trend = True
-                                       break
+                                       print ("--- min index 0 1 is "+str( self.df['close'][:minidx].count())+" "+str( self.df['close'][:minidx2])+" min price0/1 is "+"max idx 0 1 is "+(str(self.df['close'][:maxidx].count()))+" "+(str(self.df['close'][:maxidx2].count())))  
+#                                       break
+            else:
+               self.find_trend = False
+#               return False
          # if down
          else:
             idx_diff = mincnt - maxcnt + 1 
             maxidx2 = self.df['close'][minidx:].idxmax(axis=1) ;
             minidx2 = self.df['close'][:maxidx].idxmin(axis=1) ;
+            print ("x min index 0 1 is "+str(self.df['close'][:minidx].count())+" "+str(self.df['close'][:minidx2].count())+" min price0/1 is "+"max idx 0 1 is "+(str(self.df['close'][:maxidx].count()))+" "+(str(self.df['close'][:maxidx2].count())))  
+	    # in case
             if mincnt < total_cnt * 0.4:
-                minidx2 = self.df['close'][maxidx2:].idxmax(axis=1) ;
+                minidx2 = self.df['close'][maxidx2:].idxmin(axis=1) ;
+                print ("xx min index 0 1 is "+str( self.df['close'][:minidx].count())+" "+str( self.df['close'][:minidx2].count())+" min price0/1 is "+"max idx 0 1 is "+(str(self.df['close'][:maxidx].count()))+" "+(str(self.df['close'][:maxidx2].count())))  
+            if maxcnt >  total_cnt * 0.7:
+                maxidx2 = self.df['close'][:minidx2].idxmax(axis=1) ;
+                print ("xx min index 0 1 is "+str( self.df['close'][:minidx].count())+" "+str( self.df['close'][:minidx2].count())+" min price0/1 is "+"max idx 0 1 is "+(str(self.df['close'][:maxidx].count()))+" "+(str(self.df['close'][:maxidx2].count())))  
             if price_diff > self.df['close'][-1] * 0.1:
                 second_max_idx = minidx 
                 second_min_idx = maxidx
 	       #for idx in range(maxidx:minidx):
                 for idx in self.df.index[maxcnt:mincnt]:
-                       if self.df['close'][idx] - self.df['close'][second_min_idx] > price_diff * 0.2 :
-                               second_max_idx = idx 
-                       if self.df['close'][maxidx] - self.df['close'][idx] > price_diff * 0.2 :
+                       if self.df['close'][maxidx] - self.df['close'][idx] > price_diff * 0.3 and second_max_idx == minidx:
                                second_min_idx = idx 
+                       if self.df['close'][idx] - self.df['close'][second_min_idx] > price_diff * 0.3 :
+                            if self.df['close'][second_max_idx] < self.df['close'][idx] :
+                               second_max_idx = idx 
                        if second_max_idx != minidx:
                                if self.df['close'][idx] < self.df['close'][second_min_idx]:
                                        maxidx2 = second_max_idx
                                        minidx2 = second_min_idx
                                        self.find_trend = True
-                                       break
+                                       print ("xxx min index 0 1 is "+str( self.df['close'][:minidx].count())+" "+str( self.df['close'][:minidx2].count())+" min price0/1 is "+"max idx 0 1 is "+(str(self.df['close'][:maxidx].count()))+" "+(str(self.df['close'][:maxidx2].count())))  
+#                                       break
+            else:
+               self.find_trend = False
          if plot != 0:
             self.ax0.plot([self.df['close'][:minidx].count(),self.df['close'].count()],[self.df['close'][maxidx]-price_diff*0.618,self.df['close'][maxidx]-price_diff*0.618],'b--') ;
             self.ax0.plot([self.df['close'][:minidx].count(),self.df['close'].count()],[self.df['close'][maxidx]-price_diff*0.382,self.df['close'][maxidx]-price_diff*0.382],'b--') ;
@@ -143,7 +169,8 @@ class stock_study:
          self.minidx = minidx 
          self.maxidx2 = maxidx2 
          self.minidx2 = minidx2
-         if idx_diff > int(self.df['close'].count() * 0.3):
+        # if idx_diff > int(self.df['close'].count() * 0.3):
+         if price_diff > self.df['close'][-1] * 0.1 and idx_diff > 10:
            return True
          else:
            return False
@@ -174,17 +201,24 @@ class stock_study:
         x1 = self.df['close'][:self.minidx].count() 
         a = (y2 - y1)/(x2 - x1) ;
         b = (y1*x2 - x1*y2)/(x2 - x1) ;
+        print ("min index 0 1 is "+str(x1)+" "+str(x2)+" min price0/1 is "+str(y1)+" "+str(y2)+"max idx 0 1 is "+(str(self.df['close'][:self.maxidx].count()))+" "+(str(self.df['close'][:self.maxidx2].count())))  
         self.ax0.plot([self.df['close'][:self.maxidx].count(),self.df['close'][:self.maxidx2].count()],[self.df['close'][self.maxidx],self.df['close'][self.maxidx2]],'--')
-        self.ax0.plot([1,self.df['close'].count()],[a+b,a*self.df['close'].count()+b],'--') 
+        self.ax0.plot([1,self.df['close'].count()],[a+b,a*self.df['close'].count()+b],'-') 
 
     def macd_analysis(self,plot):
         macd,macdsignal,macdhist = ta.MACD(np.array(self.df['close']), fastperiod = 12,slowperiod = 26 , signalperiod = 9)
+        stdDev = ta.STDDEV(np.array(self.df['close']),timeperiod=20)
         macd[0:33] = np.zeros(33)
         macdsignal[0:33] = np.zeros(33)
         macdhist[0:33] = np.zeros(33)
+        if macdhist[-1] < macdhist[-2] and macdhist[-2] < macdhist[-3]:
+          print (str(self.code)+" macd is NOT friendly")
+        if macdhist[-1] > macdhist[-2] and macdhist[-2] > macdhist[-3]:
+          print (str(self.code)+" macd is friendly")
         if plot != 0:
             self.ax1.plot(macd,color='blue',lw=2) ;
             self.ax1.plot(macdsignal,color='red',lw=2) ;
+            self.ax1.plot(stdDev,color='green',lw=3) ;
             self.ax1.plot(macdhist) # ,color='black',lw=3) ;
 #        self.ax1.hist(macdhist) # ,color='black',lw=3) ;
         if self.find_trend:
@@ -211,6 +245,9 @@ class stock_study:
     def show_plt(self):
         plt.title(str(self.code)+ " analysis")
         plt.show()
+#        plt.savefig(str(self.code),c='k')
+        #pdf.savefig()
+
 
 
 #check if it is the real time k reverse
@@ -271,3 +308,67 @@ class stock_study:
 #      	    return False
         else:
       	    return False
+     
+    def generate_training_data(self,basic_df):
+# extend the period to generate the training data
+        count = self.df['close'].count() 
+        period = self.period + 50 
+        now = datetime.datetime.now()
+        delta = datetime.timedelta(days = period)
+        ndays = now - delta
+        print(ndays.strftime('%Y-%m-%d'))
+        dff = ts.get_h_data(self.code,start=ndays.strftime('%Y-%m-%d'))
+        #df = dff[::-1]
+        #print(dff)
+        df = dff[::-1] 
+        ma5  = ta.MA(np.array(df['close']),5,matype=0)
+        ma10 = ta.MA(np.array(df['close']),10,matype=0)
+        ma20 = ta.MA(np.array(df['close']),20,matype=0)
+        stdDev = ta.STDDEV(np.array(df['close']),timeperiod=20)
+        buy_line = ma5
+# may have issues because we cannot get enough data
+        f = open("training_data_"+str(self.code)+".csv", 'w')
+        j = 50 
+        f.write("price,vol,ma5c,ma20,maxidx,minidx,maxprice,minprice,diff,pe,outstanding totals,stdv,Y\n") 
+        for idx in df.index[50:]:
+            price = df['close'][idx] 
+            vol   = df['volume'][idx] 
+            ma5c  = ma5[j] 
+            ma20c  = ma20[j] 
+            idxcnt = df['close'][:idx].count()
+            maxidx = df['close'][idxcnt-50:idxcnt].idxmax(axis=1)
+            minidx = df['close'][idxcnt-50:idxcnt].idxmin(axis=1)
+            #minidx = df['close'][idx-50:idx].idxmin(axis=1)
+            maxprice= df['close'][maxidx]
+            minprice= df['close'][minidx]
+            maxcnt  =  df['close'][:maxidx].count()
+            mincnt  =  df['close'][:minidx].count()
+            diff = maxcnt - mincnt 
+            stdv    = stdDev[j]
+# generate the Y , check if the next 20 days 10% up and no more than 3% down
+            up_flag = 0 
+            dn_flag = 0 
+            j = j + 1
+# may have issues because we cannot get enough data
+            for i in range(1,22):
+            #     if (idx + i) > count + 50:
+            #          break 
+                 #if(df['close'][idx+i]/df['close'][idx]  > 1.1):
+                 if(df['close'][idxcnt+i]/df['close'][idx]  > 1.1):
+                      up_flag = 1 
+                 if(df['close'][idxcnt+i]/df['close'][idx]  < 0.97):
+                      dn_flag = 1 
+            if up_flag == 1 and dn_flag == 0 :
+                 Y = 1 
+            else:
+                 Y = -1 
+            if Y == 1:
+      	         buy_line[j] = self.df['close'][idx] - 1 
+      	         print("finally we found a Y = 1 sample!!!!!!!!!!!!!!!!!!"+str(self.code)+"\n") 
+            else:
+      	         buy_line[j] = 0 
+            f.write(str(price)+","+str(vol)+","+str(ma5c)+","+str(ma20c)+","+str(maxcnt)+","+str(mincnt)+","+str(maxprice)+","+str(minprice)+","+str(diff)+","+str(basic_df['pe'][self.code])+","+str(basic_df['outstanding'][self.code])+","+str(stdv)+","+str(Y)+"\n") 
+	    # regularity
+            f.write(str(price)+","+str(vol)+","+str(ma5c/price)+","+str(ma20c/price)+","+str(maxcnt/10)+","+str(mincnt/10)+","+str(maxprice/price)+","+str(minprice/price)+","+str(diff/10)+","+str(basic_df['pe'][self.code]/10)+","+str(basic_df['outstanding'][self.code])+","+str(stdv)+","+str(Y)+"\n") 
+        f.close()
+        self.ax0.plot(buy_line, color = 'orange',lw=1,)
