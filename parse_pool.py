@@ -17,6 +17,7 @@
 # ene/bolling line
 # different timing frames
 import datetime
+import os
 import tushare as ts
 import pandas as pd
 import numpy as np
@@ -43,6 +44,7 @@ def initial_pool():
    print(a_concept_list)
    # print(industry_df)
    #industry_df.to_csv('industry.csv')
+   # small and chuangye
    try:
        startup_df = ts.get_gem_classified()
        sm_df = ts.get_sme_classified()
@@ -147,9 +149,32 @@ def wave_select():
     
     print(a_wavelist) 
 
-def deep_study(code):
-     s = stock_study(code,100)
-     s.initial_df(1,"D") 
+def realtime_study(code,stock_name,save=1):
+     if(str(code) == 'sh'):
+       s = stock_study(code,200)
+     else:
+       s = stock_study(code,130)
+     s.initial_df(1,"60") 
+     print (str(code)+" stock is under wave analysis for 60min k line") 
+     if s.initial_extream_point(1): 
+       print (str(code)+" trend existed") 
+     if s.find_trend: 
+       print (str(code)+" trend found sub wave") 
+     s.plot_trend() 
+     print (str(code)+" stock is under macd analysis") 
+     s.check_ene()
+     s.macd_analysis(1)
+     print (str(code)+" stock is plotting itself") 
+     if(save == 1):
+       s.save_plt(stock_name+"_1h",basic_df)
+     s.show_plt(stock_name+"_1h",basic_df)
+
+def deep_study(code,stock_name,path,save=1):
+     if(str(code) == 'sh'):
+       s = stock_study(code,200)
+     else:
+       s = stock_study(code,130)
+     s.initial_df(1,"D",path) 
      print (str(code)+" stock is under wave analysis") 
      if s.initial_extream_point(1): 
        print (str(code)+" trend existed") 
@@ -157,9 +182,12 @@ def deep_study(code):
        print (str(code)+" trend found sub wave") 
      s.plot_trend() 
      print (str(code)+" stock is under macd analysis") 
+     s.check_ene()
      s.macd_analysis(1)
      print (str(code)+" stock is plotting itself") 
-     s.show_plt()
+     if(save == 1):
+       s.save_plt(stock_name,basic_df)
+     s.show_plt(stock_name,basic_df)
 
 def week_trend():
     print("start to week trend analyze stocks") 
@@ -225,7 +253,7 @@ def buy_analysis():
                 s.initial_extream_point(1)
                 s.plot_trend()
                 s.macd_analysis()
-                s.show_plt()
+                s.show_plt("")
         except:
             traceback.print_exc()
             pass
@@ -257,27 +285,55 @@ def buy_analysis():
     
     print(a_weektrend) 
 
-portfolios_monitor = ['600895','002405','002594','300024','002230'      ,'601633',       '002185', '002456','300115','600016','600000','300059','600584']
-portfolios_monitor = ['sh','600895','002405','002594','300024','002230'      ,'601633',       '002185', '002456','300115','600016','600000','300059','600584']
-portfolios_monitor = ['sh','600895','002405','002456','300024','002230'      ,'601633',       '002185', '002594','300115','600016','600000','300059','600584']
 
+#portfolios_finance = ['600030','600036','600109','601318','601328']
+#portfolios_industry = ['600037','002223','601231','000050','002049','300077','600597','000049','000100','600690','002032','000651','600585']
+portfolios_military = ['600150','600118','000768']
+
+stock_pool = ['002007','002230','601238','600104','300077','002594','002405','300024','601633','002185','600584','601933','600887','600597','002462','002456','000100','300015','600016','600000','300059','600895']
+stock_pool = ['002007','002230','601238','600104','300077','002594','002405','300024','601633','002185','600584','601933','600887','600597','002462','002456','300015','600016','600000','300059','600895','000100']
 
 if __name__=="__main__":
-     for stock_code in portfolios_monitor:
+     now = datetime.datetime.now()
+     path = now.strftime('%Y-%m-%d')+"-pool" 
+     if(not os.path.exists(path)):
+        os.mkdir(path)
+     basic_df = ts.get_stock_basics()
+     print ("stock pool is under deep parsing     ------------------") 
+     for stock_code in stock_pool:
         try:
-           print (str(stock_code)+" stock is under deep parsing") 
-           deep_study(stock_code)
+           stock_name = basic_df['name'][stock_code]
+           print (str(stock_code)+" in pool is under deep parsing" + str(stock_name)) 
+           deep_study(stock_code,str(stock_name),path)
         except:
            traceback.print_exc()
            pass
-     startup_pool = []
-     sm_pool= []
-     a_enelist = []
-     a_wavelist = []
-     a_weektrend = []
-     a_concept_list = []
-     initial_pool() 
-#     ene_select()
-     wave_select()
-     week_trend()
+#     print ("solid indurstry stock is under deep parsing     ------------------") 
+#     for stock_code in portfolios_industry:
+#        try:
+#           stock_name = basic_df['name'][stock_code]
+#           print (str(stock_code)+" stock is under deep parsing" + str(stock_name)) 
+#           deep_study(stock_code,str(stock_name))
+#        except:
+#           traceback.print_exc()
+#           pass
+#     print ("military related stock is under deep parsing     ------------------") 
+#     for stock_code in portfolios_military:
+#        try:
+#           stock_name = basic_df['name'][stock_code]
+#           print (str(stock_code)+" stock is under deep parsing" + str(stock_name)) 
+#           deep_study(stock_code,str(stock_name))
+#        except:
+#           traceback.print_exc()
+#           pass
+#     startup_pool = []
+#     sm_pool= []
+#     a_enelist = []
+#     a_wavelist = []
+#     a_weektrend = []
+#     a_concept_list = []
+#     initial_pool() 
+##     ene_select()
+#     wave_select()
+#     week_trend()
 

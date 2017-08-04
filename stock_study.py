@@ -15,7 +15,13 @@
 # fib
 # ene/bolling line
 # different timing frames
+#from __future__ import unicode_literals
+#import sys
+#type = sys.getfilesystemencoding()
 import datetime
+import sys
+#reload(sys)
+#sys.setdefaultencoding('utf-8')
 import tushare as ts
 import pandas as pd
 import numpy as np
@@ -28,6 +34,9 @@ from matplotlib import gridspec
 from matplotlib.mlab import csv2rec
 from matplotlib.dates import num2date, date2num, IndexDateFormatter
 from matplotlib.ticker import  IndexLocator, FuncFormatter
+from matplotlib.font_manager import FontProperties
+#import urllib2
+
 #with PdfPages('foo.pdf') as pdf
 
 class stock_study:
@@ -35,10 +44,13 @@ class stock_study:
         self.code = code
         self.period = period
         self.find_trend = False
+        self.title_str = ""
+        self.path = "pic"
 # -------------------------------------------------------------
 # initial the data frame and and if plot enable the plot will be intialled
 # -------------------------------------------------------------
-    def initial_df(self,plot,k_type):
+    def initial_df(self,plot,k_type,path):
+        self.path = path ;
         now = datetime.datetime.now()
         # now.strftime('%Y-%m-%d')
         delta = datetime.timedelta(days = self.period)
@@ -46,13 +58,20 @@ class stock_study:
         ndays = now - delta
    #    fuquan data        
         if(k_type == "D"):
-           if(self.code == "sh" or self.code == "sz"):
+           if(self.code == "sh" or self.code == "sz" or self.code == "zxb" or self.code == "cyb"):
+#             dff = ts.get_hist_data(self.code,start=ndays.strftime('%Y-%m-%d'))
              dff = ts.get_hist_data(self.code,start=ndays.strftime('%Y-%m-%d'))
            else:
+#             dff = ts.get_hist_data(self.code,start=ndays.strftime('%Y-%m-%d'))
              dff = ts.get_h_data(self.code,start=ndays.strftime('%Y-%m-%d'))
+#             dff = ts.get_k_data(self.code,start=ndays.strftime('%Y-%m-%d'))
         else:
 #        no fuquan data        
-           dff = ts.get_hist_data(self.code,start=ndays.strftime('%Y-%m-%d'),ktype="W")
+           if(k_type == "60"):
+               dff = ts.get_hist_data(self.code,start=ndays.strftime('%Y-%m-%d'),ktype='60')
+           else:
+               dff = ts.get_hist_data(self.code,start=ndays.strftime('%Y-%m-%d'),ktype="W")
+#           dff = ts.get_k_data(self.code,start=ndays.strftime('%Y-%m-%d'),ktype="W")
         self.df = dff[::-1] 
         if plot != 0:
              ma5  = ta.MA(np.array(self.df['close']),5,matype=0)
@@ -61,9 +80,11 @@ class stock_study:
              if ma5[-1] > ma20[-1]:
                      if self.df['close'][-1] > ma5[-1]:
                         print(" the stock "+str(self.code)+" is bull! ") ;
+                        self.title_str = str(self.code)+" is bull! " 
              if ma5[-1] < ma20[-1]:
                      if self.df['close'][-1] < ma5[-1]:
                         print(" the stock "+str(self.code)+" is bear! ") ;
+                        self.title_str = str(self.code)+" is bear! " 
              fig = plt.figure()
              fig.subplots_adjust(bottom=0.1)
              fig.subplots_adjust(hspace=0)
@@ -97,15 +118,15 @@ class stock_study:
          if maxidx > minidx :
             minidx2 = self.df['close'][maxidx:].idxmin(axis=1) ;
             maxidx2 = self.df['close'][:minidx].idxmax(axis=1) ;
-            print ("- min index 0 1 is "+str( self.df['close'][:minidx].count())+" "+str( self.df['close'][:minidx2].count())+" min price0/1 is "+"max idx 0 1 is "+(str(self.df['close'][:maxidx].count()))+" "+(str(self.df['close'][:maxidx2].count())))  
+#            print ("- min index 0 1 is "+str( self.df['close'][:minidx].count())+" "+str( self.df['close'][:minidx2].count())+" min price0/1 is "+"max idx 0 1 is "+(str(self.df['close'][:maxidx].count()))+" "+(str(self.df['close'][:maxidx2].count())))  
             idx_diff = maxcnt - mincnt + 1 
 	    # in case the wave trend is very very narrow
             if maxcnt < total_cnt * 0.4:
                 maxidx2 = self.df['close'][minidx2:].idxmax(axis=1) ;
-                print ("-- min index 0 1 is "+str( self.df['close'][:minidx].count())+" "+str( self.df['close'][:minidx2].count())+" min price0/1 is "+"max idx 0 1 is "+(str(self.df['close'][:maxidx].count()))+" "+(str(self.df['close'][:maxidx2].count())))  
+#                print ("-- min index 0 1 is "+str( self.df['close'][:minidx].count())+" "+str( self.df['close'][:minidx2].count())+" min price0/1 is "+"max idx 0 1 is "+(str(self.df['close'][:maxidx].count()))+" "+(str(self.df['close'][:maxidx2].count())))  
             if mincnt >  total_cnt * 0.7:
                 minidx2 = self.df['close'][:maxidx2].idxmax(axis=1) ;
-                print ("-- min index 0 1 is "+str( self.df['close'][:minidx].count())+" "+str( self.df['close'][:minidx2].count())+" min price0/1 is "+"max idx 0 1 is "+(str(self.df['close'][:maxidx].count()))+" "+(str(self.df['close'][:maxidx2].count())))  
+#                print ("-- min index 0 1 is "+str( self.df['close'][:minidx].count())+" "+str( self.df['close'][:minidx2].count())+" min price0/1 is "+"max idx 0 1 is "+(str(self.df['close'][:maxidx].count()))+" "+(str(self.df['close'][:maxidx2].count())))  
 
             if price_diff > self.df['close'][-1] * 0.1:
                 second_max_idx = minidx 
@@ -123,7 +144,7 @@ class stock_study:
                                        maxidx2 = second_max_idx
                                        minidx2 = second_min_idx
                                        self.find_trend = True
-                                       print ("--- min index 0 1 is "+str( self.df['close'][:minidx].count())+" "+str( self.df['close'][:minidx2])+" min price0/1 is "+"max idx 0 1 is "+(str(self.df['close'][:maxidx].count()))+" "+(str(self.df['close'][:maxidx2].count())))  
+#                                       print ("--- min index 0 1 is "+str( self.df['close'][:minidx].count())+" "+str( self.df['close'][:minidx2])+" min price0/1 is "+"max idx 0 1 is "+(str(self.df['close'][:maxidx].count()))+" "+(str(self.df['close'][:maxidx2].count())))  
 #                                       break
             else:
                self.find_trend = False
@@ -133,14 +154,14 @@ class stock_study:
             idx_diff = mincnt - maxcnt + 1 
             maxidx2 = self.df['close'][minidx:].idxmax(axis=1) ;
             minidx2 = self.df['close'][:maxidx].idxmin(axis=1) ;
-            print ("x min index 0 1 is "+str(self.df['close'][:minidx].count())+" "+str(self.df['close'][:minidx2].count())+" min price0/1 is "+"max idx 0 1 is "+(str(self.df['close'][:maxidx].count()))+" "+(str(self.df['close'][:maxidx2].count())))  
+#            print ("x min index 0 1 is "+str(self.df['close'][:minidx].count())+" "+str(self.df['close'][:minidx2].count())+" min price0/1 is "+"max idx 0 1 is "+(str(self.df['close'][:maxidx].count()))+" "+(str(self.df['close'][:maxidx2].count())))  
 	    # in case
             if mincnt < total_cnt * 0.4:
                 minidx2 = self.df['close'][maxidx2:].idxmin(axis=1) ;
-                print ("xx min index 0 1 is "+str( self.df['close'][:minidx].count())+" "+str( self.df['close'][:minidx2].count())+" min price0/1 is "+"max idx 0 1 is "+(str(self.df['close'][:maxidx].count()))+" "+(str(self.df['close'][:maxidx2].count())))  
+#                print ("xx min index 0 1 is "+str( self.df['close'][:minidx].count())+" "+str( self.df['close'][:minidx2].count())+" min price0/1 is "+"max idx 0 1 is "+(str(self.df['close'][:maxidx].count()))+" "+(str(self.df['close'][:maxidx2].count())))  
             if maxcnt >  total_cnt * 0.7:
                 maxidx2 = self.df['close'][:minidx2].idxmax(axis=1) ;
-                print ("xx min index 0 1 is "+str( self.df['close'][:minidx].count())+" "+str( self.df['close'][:minidx2].count())+" min price0/1 is "+"max idx 0 1 is "+(str(self.df['close'][:maxidx].count()))+" "+(str(self.df['close'][:maxidx2].count())))  
+#                print ("xx min index 0 1 is "+str( self.df['close'][:minidx].count())+" "+str( self.df['close'][:minidx2].count())+" min price0/1 is "+"max idx 0 1 is "+(str(self.df['close'][:maxidx].count()))+" "+(str(self.df['close'][:maxidx2].count())))  
             if price_diff > self.df['close'][-1] * 0.1:
                 second_max_idx = minidx 
                 second_min_idx = maxidx
@@ -156,7 +177,7 @@ class stock_study:
                                        maxidx2 = second_max_idx
                                        minidx2 = second_min_idx
                                        self.find_trend = True
-                                       print ("xxx min index 0 1 is "+str( self.df['close'][:minidx].count())+" "+str( self.df['close'][:minidx2].count())+" min price0/1 is "+"max idx 0 1 is "+(str(self.df['close'][:maxidx].count()))+" "+(str(self.df['close'][:maxidx2].count())))  
+#                                       print ("xxx min index 0 1 is "+str( self.df['close'][:minidx].count())+" "+str( self.df['close'][:minidx2].count())+" min price0/1 is "+"max idx 0 1 is "+(str(self.df['close'][:maxidx].count()))+" "+(str(self.df['close'][:maxidx2].count())))  
 #                                       break
             else:
                self.find_trend = False
@@ -201,7 +222,7 @@ class stock_study:
         x1 = self.df['close'][:self.minidx].count() 
         a = (y2 - y1)/(x2 - x1) ;
         b = (y1*x2 - x1*y2)/(x2 - x1) ;
-        print ("min index 0 1 is "+str(x1)+" "+str(x2)+" min price0/1 is "+str(y1)+" "+str(y2)+"max idx 0 1 is "+(str(self.df['close'][:self.maxidx].count()))+" "+(str(self.df['close'][:self.maxidx2].count())))  
+#        print ("min index 0 1 is "+str(x1)+" "+str(x2)+" min price0/1 is "+str(y1)+" "+str(y2)+"max idx 0 1 is "+(str(self.df['close'][:self.maxidx].count()))+" "+(str(self.df['close'][:self.maxidx2].count())))  
         self.ax0.plot([self.df['close'][:self.maxidx].count(),self.df['close'][:self.maxidx2].count()],[self.df['close'][self.maxidx],self.df['close'][self.maxidx2]],'--')
         self.ax0.plot([1,self.df['close'].count()],[a+b,a*self.df['close'].count()+b],'-') 
 
@@ -242,8 +263,28 @@ class stock_study:
                      print (str(self.code)+"macd bottom volume beili")
                  return False
 
-    def show_plt(self):
-        plt.title(str(self.code)+ " analysis")
+    def save_plt(self,stock_name,basic_df):
+        optional_str = ""
+#        if(self.code != "sh" and self.code != "sz"):
+        if(self.code != "sh" and self.code != "sz" and self.code != "cyb" and self.code != "zxb"):
+            optional_str = "pe is:"+str(basic_df['pe'][self.code])+" change per"+str((self.df['close'][-1] - self.df['close'][-2])*100/self.df['close'][-2]) 
+        font_set = FontProperties(fname=r"c:\windows\fonts\simsun.ttc", size=15)
+        #title_string = str(self.code)+ " analysis "+str(stock_name)+self.title_str
+        title_str= str(self.code)+ " analysis "+str(stock_name)+self.title_str+optional_str
+        #plt.title(unicode("这个是一个测试的浦发银行").encode("utf-8")+"600000",fontproperties=font_set)
+        plt.title(title_str)
+        plt.savefig("./"+self.path+"/"+stock_name,c='k')
+
+    def show_plt(self,stock_name,basic_df):
+        optional_str = ""
+        if(self.code != "sh" and self.code != "sz" and self.code != "cyb" and self.code != "zxb"):
+            optional_str = "pe is:"+str(basic_df['pe'][self.code])+" change per"+str((self.df['close'][-1] - self.df['close'][-2])*100/self.df['close'][-2]) 
+#        name = stock_name.decode('utf-8').encode(type) ;
+        font_set = FontProperties(fname=r"c:\windows\fonts\simsun.ttc", size=15)
+        title_str = str(self.code)+ " analysis "+str(stock_name)+self.title_str+optional_str
+        #plt.title(u"中文".encode('utf-8'),fontproperties=font_set)
+        #plt.title(str(self.code)+ " analysis "+str(stock_name)+self.title_str)
+        plt.title(title_str)
         plt.show()
 #        plt.savefig(str(self.code),c='k')
         #pdf.savefig()
@@ -279,27 +320,42 @@ class stock_study:
            return True
         return False
 
+#    def check_liquid(self):
+#        stock_url = "http://data.eastmoney.com/zjlx/"+str(code)+".html" 
+#        req = urllib2.Request(stock_url)
+#        resp = urllib2.urlopen(stock_url)
+#        respHtml = resp.read()
+#        print("respHtml=",respHtml)
+
     def check_ene(self):
         M1 = 9
         N = 11
         M2 = 10
         ma = ta.MA(np.array(self.df['close']),N,matype=0) 
         ENEbotline = (1-M2/100) * ma 
-#        ENEtopline = (1+M1/100) * ma 
+        ENEtopline = (1+M1/100) * ma 
         if self.df['low'].count() < 3:
            return False 
-#        self.ax0.plot(ENEbotline, color = 'pink',lw=2)
-#        self.ax0.plot(ENEtopline, color = 'pink',lw=2)
+        self.ax0.plot(ENEbotline, color = 'pink',lw=2)
+        self.ax0.plot(ENEtopline, color = 'pink',lw=2)
+        self.ax0.plot(ma, color = 'black',lw=2)
+        if self.df['high'][-1] > ENEtopline[-1]:
+      	    print("check ENE find ene high break for "+str(self.code)) 
+#            self.title_str = self.title_str+"ENE high reached"
         if self.df['low'][-1] < ENEbotline[-1]:
       	    print("check ENE find ene low break for "+str(self.code)) 
+#            self.title_str = self.title_str+"ENE low break" 
 #      	    print("buy!!!") 
       	    return True
         elif self.df['low'][-2] < ENEbotline[-2]:
       	    print("check ENE find ene low break for "+str(self.code)) 
+#            self.title_str = self.title_str+"ENE low break " 
 #      	    print("buy!!!") 
       	    return True
         elif self.df['low'][-3] < ENEbotline[-3]:
       	    print("check ENE find ene low break for "+str(self.code)) 
+#            self.title_str = self.title_str+"ENE low break " 
+#            self.title_str = str(self.code)+" is bull! " 
 #      	    print("buy!!!") 
       	    return True
 #        elif self.df['high'][-1] > ENEtopline[-1]:
