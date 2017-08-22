@@ -101,10 +101,14 @@ class stock_study:
     def initial_extream_point(self,plot):
 #         print(self.df['close'].count()) ;
          total_cnt = self.df['close'].count() 
-         if total_cnt < 20:
-            return False
          maxidx = self.df['close'].idxmax(axis=1)
          minidx = self.df['close'].idxmin(axis=1)
+         if total_cnt < 20:
+            self.maxidx = maxidx 
+            self.minidx = minidx 
+            self.maxidx2 = maxidx 
+            self.minidx2 = minidx
+            return False
          #now = datetime.datetime.now()
          # now.strftime('%Y-%m-%d')
          #detla = datetime.timedelta(days = 120)
@@ -229,6 +233,8 @@ class stock_study:
     def macd_analysis(self,plot):
         macd,macdsignal,macdhist = ta.MACD(np.array(self.df['close']), fastperiod = 12,slowperiod = 26 , signalperiod = 9)
         stdDev = ta.STDDEV(np.array(self.df['close']),timeperiod=20)
+        if len(macd) < 33:
+          return False 
         macd[0:33] = np.zeros(33)
         macdsignal[0:33] = np.zeros(33)
         macdhist[0:33] = np.zeros(33)
@@ -242,13 +248,14 @@ class stock_study:
             self.ax1.plot(stdDev,color='green',lw=3) ;
             self.ax1.plot(macdhist) # ,color='black',lw=3) ;
 #        self.ax1.hist(macdhist) # ,color='black',lw=3) ;
+        maxidx_cnt  = self.df['close'][:self.maxidx].count() -1
+        maxidx2_cnt = self.df['close'][:self.maxidx2].count() -1
+        minidx_cnt  = self.df['close'][:self.minidx].count() -1
+        minidx2_cnt = self.df['close'][:self.minidx2].count() -1
         if self.find_trend:
-            maxidx_cnt  = self.df['close'][:self.maxidx].count() 
-            maxidx2_cnt = self.df['close'][:self.maxidx2].count() 
-            minidx_cnt  = self.df['close'][:self.minidx].count() 
-            minidx2_cnt = self.df['close'][:self.minidx2].count() 
-#            print("maxidx is "+str(maxidx_cnt)+" macdhist is "+str(macdhist[maxidx_cnt]))
-#            print("maxidx2 is "+str(maxidx2_cnt)+" macdhist 2 is "+str(macdhist[maxidx2_cnt]))
+            print(" macdhist is size is "+str(len(macdhist))+"max idx cnt is "+str(maxidx_cnt))
+            print("maxidx is "+str(maxidx_cnt)+" macdhist is "+str(macdhist[maxidx_cnt]))
+            print("maxidx2 is "+str(maxidx2_cnt)+" macdhist 2 is "+str(macdhist[maxidx2_cnt]))
             if self.maxidx > self.minidx:
                  if macdhist[maxidx_cnt] < macdhist[maxidx2_cnt]:
                      print (str(self.code)+" macd top beili")
@@ -267,10 +274,12 @@ class stock_study:
         optional_str = ""
 #        if(self.code != "sh" and self.code != "sz"):
         if(self.code != "sh" and self.code != "sz" and self.code != "cyb" and self.code != "zxb"):
-            optional_str = "pe is:"+str(basic_df['pe'][self.code])+" change per"+str((self.df['close'][-1] - self.df['close'][-2])*100/self.df['close'][-2]) 
+            optional_str = "pe is:"+str(basic_df['pe'][self.code])+" change per"+str(round((self.df['close'][-1] - self.df['close'][-2])*100/self.df['close'][-2],2)) +"% vol change"+str(round((self.df['volume'][-1] - self.df['volume'][-2])*100/self.df['volume'][-2],2))+"%"
+        else:
+            optional_str = "change per"+str(round((self.df['close'][-1] - self.df['close'][-2])*100/self.df['close'][-2],2)) +"% vol change"+str(round((self.df['volume'][-1] - self.df['volume'][-2])*100/self.df['volume'][-2],2))+"%"
         font_set = FontProperties(fname=r"c:\windows\fonts\simsun.ttc", size=15)
         #title_string = str(self.code)+ " analysis "+str(stock_name)+self.title_str
-        title_str= str(self.code)+ " analysis "+str(stock_name)+self.title_str+optional_str
+        title_str= str(stock_name)+self.title_str+optional_str
         #plt.title(unicode("这个是一个测试的浦发银行").encode("utf-8")+"600000",fontproperties=font_set)
         plt.title(title_str)
         plt.savefig("./"+self.path+"/"+stock_name,c='k')
@@ -278,10 +287,12 @@ class stock_study:
     def show_plt(self,stock_name,basic_df):
         optional_str = ""
         if(self.code != "sh" and self.code != "sz" and self.code != "cyb" and self.code != "zxb"):
-            optional_str = "pe is:"+str(basic_df['pe'][self.code])+" change per"+str((self.df['close'][-1] - self.df['close'][-2])*100/self.df['close'][-2]) 
+            optional_str = "pe is:"+str(basic_df['pe'][self.code])+" change per"+str(round((self.df['close'][-1] - self.df['close'][-2])*100/self.df['close'][-2],2)) +"% vol change"+str(round((self.df['volume'][-1] - self.df['volume'][-2])*100/self.df['volume'][-2],2))+"%"
+        else:
+            optional_str = "change per"+str(round((self.df['close'][-1] - self.df['close'][-2])*100/self.df['close'][-2],2)) +"% vol change"+str(round((self.df['volume'][-1] - self.df['volume'][-2])*100/self.df['volume'][-2],2))+"%"
 #        name = stock_name.decode('utf-8').encode(type) ;
         font_set = FontProperties(fname=r"c:\windows\fonts\simsun.ttc", size=15)
-        title_str = str(self.code)+ " analysis "+str(stock_name)+self.title_str+optional_str
+        title_str = str(stock_name)+self.title_str+optional_str
         #plt.title(u"中文".encode('utf-8'),fontproperties=font_set)
         #plt.title(str(self.code)+ " analysis "+str(stock_name)+self.title_str)
         plt.title(title_str)
