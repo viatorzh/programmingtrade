@@ -232,15 +232,34 @@ def week_trend():
     
     print(a_weektrend) 
 
-def pool_analysis(stock_pool,basic_df,path,prefix="",show=1):
+def IsSubString(SubStrList,Str):  
+    ''''' 
+    #判断字符串Str是否包含序列SubStrList中的每一个子字符串 
+    #>>>SubStrList=['F','EMS','txt'] 
+    #>>>Str='F06925EMS91.txt' 
+    #>>>IsSubString(SubStrList,Str)#return True (or False) 
+    '''  
+    flag=False
+    for substr in SubStrList:  
+        if (Str in substr):  
+            flag=True
+#            print(Str + "is in list"+ SubStrList)
+  
+    return flag
+
+def pool_analysis(stock_pool,basic_df,path,parsed_list,prefix="",show=1):
      for stock_code in stock_pool:
-        try:
-           stock_name = basic_df['name'][stock_code]
-           print (str(stock_code)+" in pool is under deep parsing" + str(stock_name)) 
-           deep_study(stock_code,str(stock_name),basic_df,path,prefix,1,show)
-        except:
-           traceback.print_exc()
-           pass
+        if(not IsSubString(parsed_list,str(stock_code))):
+           try:
+              stock_name = basic_df['name'][stock_code]
+              print (str(stock_code)+" in pool is under deep parsing" + str(stock_name)) 
+              deep_study(stock_code,str(stock_name),basic_df,path,prefix,1,show)
+           except:
+              traceback.print_exc()
+              pass
+        else:
+           print(str(stock_code)+" has been parsed before"+str(basic_df['name'][stock_code])) 
+        
 
 def buy_analysis():
     print("--------------------------------------------------------------------") 
