@@ -37,7 +37,7 @@ stock_pool = ['002230','300024','601933','600887','600597','600016','600000','30
 stock_pool_military = ['600862','600879','000768','600150','002190','600118']
 stock_pool_appliance= ['002032','600060','000651']
 stock_pool_ee       = ['600703','002636','601231','600584','002185','600183','002049','300077','603986']
-stock_pool_med      = ['300676','601607','000423','600056','002185','603168','002462','300015']
+stock_pool_med      = ['300676','601607','000423','600056','603168','002462','300015']
 stock_pool_sw       = ['600756']
 stock_pool_auto     = ['002594','600104','601633','601238','002405','600081','002232','002055','300270','601799','300304']
 stock_pool_apple    = ['300115','002456','000050','000049','002635','000823','002241','300433']
@@ -77,7 +77,7 @@ if __name__=="__main__":
      pool_analysis(stock_pool_sw,basic_df,path,parsed_list,"sw",show) 
      pool_analysis(stock_pool_auto,basic_df,path,parsed_list,"auto",show) 
      pool_analysis(stock_pool_apple,basic_df,path,parsed_list,"apple",show) 
-     pool_analysis(stock_pool_apple,basic_df,path,parsed_list,"med",show) 
+     pool_analysis(stock_pool_med,basic_df,path,parsed_list,"med",show) 
      pool_analysis(stock_pool_military,basic_df,path,parsed_list,"mil",show) 
 #     print ("solid indurstry stock is under deep parsing     ------------------") 
 #     for stock_code in portfolios_industry:
