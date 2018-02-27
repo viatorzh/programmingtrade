@@ -25,6 +25,7 @@ import numpy as np
 import talib as ta
 import traceback
 from stock_study import stock_study
+import matplotlib.pyplot as plt
 
 
 
@@ -46,7 +47,7 @@ def realtime_study(code,stock_name,path,save=1):
      print (str(code)+" stock is plotting itself") 
      if(save == 1):
        s.save_plt(stock_name+"_1h",basic_df)
-     s.show_plt(stock_name+"_1h",basic_df)
+#     s.show_plt(stock_name+"_1h",basic_df)
 
 def deep_study(code,stock_name,path,save=1):
      if(str(code) == 'sh'):
@@ -66,7 +67,8 @@ def deep_study(code,stock_name,path,save=1):
      print (str(code)+" stock is plotting itself") 
      if(save == 1):
        s.save_plt(stock_name,basic_df)
-     s.show_plt(stock_name,basic_df)
+#     s.show_plt(stock_name,basic_df)
+     return s.df['close'][-1] 
 
 
 portfolios_monitor = ['600895','002405','002594','300024','002230'      ,'601633',       '002185', '002456','300115','600016','600000','300059','600584']
@@ -74,7 +76,12 @@ portfolios_monitor = ['sh','600895','002405','002594','300024','002230'      ,'6
 portfolios_monitor = ['sh','600895','002405','002456','300024','002230'      ,'601633',       '002185', '002594','300115','600016','600000','300059','600584']
 portfolios_monitor = ['600895','002405','002456','600000','300024','002230'      ,'601633',       '002185', '002594','300115','600016','300059','600584']
 #portfolios_monitor = ['600584','601633','002636','002594','300059','600895']
-portfolios_monitor = ['600000','002185','002594','601633','603160']
+portfolios_monitor = ['600000','002185','002594','601633','603160','600663']
+portfolios_monitor = ['600000','002185','002594','601633','603160','600663']
+#tel = {'jack': 4098, 'sape': 4139}
+#portfolios = {'002185': 3100 ,'002635':1000 , '300059':2400, '300077':1200,'600487':300,'600663':400,'601633':4100}
+portfolios = [ ['002185',3100,'2017-12-10',7.951],['002635',1000,'2017-12-22',23.31],['300059',2400,'2017-12-30',14.511],['300077',1200,'2017-12-15',10.254],['600487',300,'2017-12-5',35.117],['600663',400,'2017-11-8',20.003],['601633',4100,'2017-10-15',11.888],['600000',1100,'2018-2-26',12.755]]
+portfolios_arr = np.array(portfolios)
 
 #portfolios_finance = ['600030','600036','600109','601318','601328']
 #portfolios_industry = ['600037','002223','601231','000050','002049','300077','600597','000049','000100','600690','002032','000651','600585']
@@ -89,18 +96,57 @@ if __name__=="__main__":
      if(not os.path.exists(path)):
         os.mkdir(path)
      basic_df = ts.get_stock_basics()
-     deep_study('sh','上证综指',path)
-     deep_study('sz','深证成指',path)
-     deep_study('zxb','中小板',path)
-     deep_study('cyb','创业板',path)
+     num = portfolios_arr.shape[0]
+#     deep_study('sh','上证综指',path)
+#     deep_study('sz','深证成指',path)
+#     deep_study('zxb','中小板',path)
+#     deep_study('cyb','创业板',path)
 #     f.open("portfolios_analysis.csv",'w')
      print ("classic stock is under deep parsing     ------------------") 
-     for stock_code in portfolios_monitor:
+#     for stock_code in portfolios_monitor:
+     #for stock_code, amount in portfolios.items():
+     count = 0 ;
+     total_value = 0 ;
+     total_cost = 0 ;
+     price = 0 ;
+     labels = []
+     percentage = []
+     print(portfolios_arr[:,:1]) ;
+#     portfolios= [['002185', '23870.0','78'],['002635', '21780.0','66'],['300059','33432.0','58'],['300077','9804.0','73'],['600487','11385.0','83'],['600663', '7780.0' ,'110'],['601633','52234.0','134'],['600000','14003.0','0']] 
+#     portfolios_arr = np.array(portfolios)
+#     print(portfolios_arr)
+     while count < num :
         try:
+           stock_code = portfolios_arr[count,0]
            stock_name = basic_df['name'][stock_code]
            print (str(stock_code)+" stock is under deep parsing" + str(stock_name)) 
-           deep_study(stock_code,str(stock_name),path)
+           price = deep_study(stock_code,str(stock_name),path)
+           cost = float(portfolios_arr[count,3])
+#           portfolios[stock_code] = price*amount 
+           amount = (portfolios_arr[count,1])
+           portfolios_arr[count,1] = float(price)*float(amount)
+           total_value = float(price)*float(amount) + total_value 
+           total_cost = float(cost)*float(amount) + total_cost
+           datestr = portfolios_arr[count,2]
+           date_time = datetime.datetime.strptime(datestr,'%Y-%m-%d')
+           delta     = now - date_time ;
+           portfolios_arr[count,2] = delta.days
            realtime_study(stock_code,str(stock_name),path)
+           labels.append(stock_code)
+           percentage.append(float(price)*float(amount))
         except:
            traceback.print_exc()
            pass
+        count = count + 1 
+     print (portfolios_arr)
+     print (percentage)
+     print (labels)
+     print (total_value)
+     print (total_cost)
+#     percentage = percentage 
+     explode = (0, 0, 0, 0,0,0,0,0)  # only "explode" the 2nd slice (i.e. 'Hogs')
+     fig1, ax1 = plt.subplots()
+     ax1.pie(percentage, explode=explode, labels=labels, autopct='%1.1f%%', shadow=True, startangle=90)
+     ax1.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+#     plt.show()
+     plt.savefig("portion_pie",c='k')

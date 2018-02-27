@@ -40,7 +40,7 @@ stock_pool_ee       = ['600703','002636','601231','600584','002185','600183','00
 stock_pool_med      = ['300676','601607','000423','600056','603168','002462','300015']
 stock_pool_sw       = ['600756']
 stock_pool_auto     = ['002594','600104','601633','601238','002405','600081','002232','002055','300270','601799','300304']
-stock_pool_apple    = ['300115','002456','000050','000049','002635','000823','002241','300433']
+stock_pool_apple    = ['603626','300115','002456','000050','000049','002635','000823','002241','300433']
 stock_pool_ai = ['300496','300053','603019','603160']
 
 parsed_list = []
@@ -70,12 +70,12 @@ if __name__=="__main__":
 #        except:
 #           traceback.print_exc()
 #           pass
+     pool_analysis(stock_pool_auto,basic_df,path,parsed_list,"auto",show) 
      pool_analysis(stock_pool_ai,basic_df,path,parsed_list,"ai",show) 
      pool_analysis(stock_pool,basic_df,path,parsed_list,"sp",show) 
      pool_analysis(stock_pool_ee,basic_df,path,parsed_list,"ee",show) 
      pool_analysis(stock_pool_appliance,basic_df,path,parsed_list,"app",show) 
      pool_analysis(stock_pool_sw,basic_df,path,parsed_list,"sw",show) 
-     pool_analysis(stock_pool_auto,basic_df,path,parsed_list,"auto",show) 
      pool_analysis(stock_pool_apple,basic_df,path,parsed_list,"apple",show) 
      pool_analysis(stock_pool_med,basic_df,path,parsed_list,"med",show) 
      pool_analysis(stock_pool_military,basic_df,path,parsed_list,"mil",show) 
