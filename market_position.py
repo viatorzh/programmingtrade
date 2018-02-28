@@ -64,6 +64,8 @@ def deep_study(code,stock_name,path,save=1):
      print (str(code)+" stock is under macd analysis") 
      s.check_ene()
      s.macd_analysis(1)
+     if(s.check_kpattern == -1):
+        print ("!!!!!!!!!!!!!!!!"+str(code)+" stock k reversed should be cleared!!!!!!!!!!!!!!!!!!!!!!!") 
      print (str(code)+" stock is plotting itself") 
      if(save == 1):
        s.save_plt(stock_name,basic_df)
@@ -130,6 +132,8 @@ if __name__=="__main__":
            datestr = portfolios_arr[count,2]
            date_time = datetime.datetime.strptime(datestr,'%Y-%m-%d')
            delta     = now - date_time ;
+           if(int(delta.days) > 30):
+             print ("!!!!!!!!!!!!!!!!"+str(stock_code)+" holding time exceed 30 days, please notice that !!!!!!!!!!!!!!!!!!!!!!!") 
            portfolios_arr[count,2] = delta.days
            realtime_study(stock_code,str(stock_name),path)
            labels.append(stock_code)
