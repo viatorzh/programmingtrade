@@ -44,6 +44,8 @@ def realtime_study(code,stock_name,path,save=1):
      print (str(code)+" stock is under macd analysis") 
      s.check_ene()
      s.macd_analysis(1)
+     if s.check_kpattern_neg() == -1:
+        print (" !!!!!!!!!!!!!!!!!  the stock "+str(code) + " K is getting worse, please consider short the position !!!!!!") ;
      print (str(code)+" stock is plotting itself") 
      if(save == 1):
        s.save_plt(stock_name+"_1h",basic_df)
@@ -82,7 +84,7 @@ portfolios_monitor = ['600000','002185','002594','601633','603160','600663']
 portfolios_monitor = ['600000','002185','002594','601633','603160','600663']
 #tel = {'jack': 4098, 'sape': 4139}
 #portfolios = {'002185': 3100 ,'002635':1000 , '300059':2400, '300077':1200,'600487':300,'600663':400,'601633':4100}
-portfolios = [ ['002185',3100,'2017-12-10',7.951],['002635',500,'2017-12-22',23.31],['300059',2400,'2017-12-30',14.511],['600663',400,'2017-11-8',20.003],['601633',2100,'2017-10-15',11.888],['600000',1100,'2018-2-26',12.755]]
+portfolios = [ ['002185',3100,'2017-12-10',7.951],['600597',1100,'2018-3-5',12.905],['300059',3500,'2017-12-30',14.289],['600663',400,'2017-11-8',20.003],['601633',2100,'2017-10-15',11.888],['600000',2100,'2018-3-5',12.603]]
 portfolios_arr = np.array(portfolios)
 
 #portfolios_finance = ['600030','600036','600109','601318','601328']
@@ -99,10 +101,10 @@ if __name__=="__main__":
         os.mkdir(path)
      basic_df = ts.get_stock_basics()
      num = portfolios_arr.shape[0]
-#     deep_study('sh','上证综指',path)
-#     deep_study('sz','深证成指',path)
-#     deep_study('zxb','中小板',path)
-#     deep_study('cyb','创业板',path)
+     deep_study('sh','上证综指',path)
+     deep_study('sz','深证成指',path)
+     deep_study('zxb','中小板',path)
+     deep_study('cyb','创业板',path)
 #     f.open("portfolios_analysis.csv",'w')
      print ("classic stock is under deep parsing     ------------------") 
 #     for stock_code in portfolios_monitor:

@@ -95,6 +95,9 @@ class stock_study:
              self.ax0.plot(ma5, color = 'black',lw=2,)
              self.ax0.plot(ma20, color = 'yellow',lw=2)
              self.ax0.plot(ma10, color = 'green',lw=2)
+             if ma5[-1] < ma10[-1]:
+                if(k_type == "60"):
+                    print (" !!!!!!!!!!!!!!!!!  the stock "+str(self.code) + " ma is getting worse, please consider short the position !!!!!!") ;
 
 
 
@@ -316,6 +319,30 @@ class stock_study:
            if self.df['close'][-1] > self.df['open'][-2] and self.df['open'][-1] < self.df['close'][-2]:
               return 1
         return False
+    def check_kpattern_neg(self):
+        N = 20
+        volma = ta.MA(np.array(self.df['volume']),N,matype=0)
+        threshold = volma[-1] * 1.5 
+        pos_start_find = 0
+        neg_end_find   = 0
+        # now trying to find the second positive K style and latest negative k
+        if self.df['volume'].count() < 6:
+           return False
+        for i in range(1, 6):
+            closep = self.df['close'][-i]
+            openp  = self.df['open'][-i]
+            if openp > closep: 
+               if neg_end_find == 0:
+                       neg_end = closep 
+                       neg_end_find = 1 
+            else:
+               if pos_start_find < 2 and neg_end_find == 1:
+                       pos_start = openp
+                       pos_start_find = pos_start_find + 1
+        if neg_end < pos_start:
+           return -1 
+        else:
+           return False
 
     def check_vol(self):
         N = 20
