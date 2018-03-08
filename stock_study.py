@@ -56,6 +56,9 @@ class stock_study:
         delta = datetime.timedelta(days = self.period)
    #    delta = datetime.timedelta(days = 60)
         ndays = now - delta
+        speriod = 5 
+        mperiod = 10
+        lperiod = 20 
    #    fuquan data        
         if(k_type == "D"):
            if(self.code == "sh" or self.code == "sz" or self.code == "zxb" or self.code == "cyb"):
@@ -69,14 +72,17 @@ class stock_study:
 #        no fuquan data        
            if(k_type == "60"):
                dff = ts.get_hist_data(self.code,start=ndays.strftime('%Y-%m-%d'),ktype='60')
+               speriod = 3 
+               mperiod = 8
+               lperiod = 15 
            else:
                dff = ts.get_hist_data(self.code,start=ndays.strftime('%Y-%m-%d'),ktype="W")
 #           dff = ts.get_k_data(self.code,start=ndays.strftime('%Y-%m-%d'),ktype="W")
         self.df = dff[::-1] 
         if plot != 0:
-             ma5  = ta.MA(np.array(self.df['close']),5,matype=0)
-             ma10 = ta.MA(np.array(self.df['close']),10,matype=0)
-             ma20 = ta.MA(np.array(self.df['close']),20,matype=0)
+             ma5  = ta.MA(np.array(self.df['close']),speriod,matype=0)
+             ma10 = ta.MA(np.array(self.df['close']),mperiod,matype=0)
+             ma20 = ta.MA(np.array(self.df['close']),lperiod,matype=0)
              if ma5[-1] > ma20[-1]:
                      if self.df['close'][-1] > ma5[-1]:
                         print(" the stock "+str(self.code)+" is bull! ") ;
