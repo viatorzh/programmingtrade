@@ -331,6 +331,8 @@ class stock_study:
         threshold = volma[-1] * 1.5 
         pos_start_find = 0
         neg_end_find   = 0
+        pos_start = self.df['close'][-1]
+        neg_end   = self.df['close'][-1]
         # now trying to find the second positive K style and latest negative k
         if self.df['volume'].count() < 6:
            return False
