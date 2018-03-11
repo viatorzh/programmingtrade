@@ -149,7 +149,7 @@ def wave_select():
     
     print(a_wavelist) 
 
-def realtime_study(code,stock_name,save=1):
+def realtime_study(code,stock_name,path,save=1,show=1):
      if(str(code) == 'sh'):
        s = stock_study(code,200)
      else:
@@ -167,7 +167,8 @@ def realtime_study(code,stock_name,save=1):
      print (str(code)+" stock is plotting itself") 
      if(save == 1):
        s.save_plt(stock_name+"_1h",basic_df)
-     s.show_plt(stock_name+"_1h",basic_df)
+     if(show == 1):
+       s.show_plt(stock_name+"_1h",basic_df)
 
 def deep_study(code,stock_name,basic_df,path,nick="",save=1,show=1):
      if(str(code) == 'sh'):
@@ -189,6 +190,8 @@ def deep_study(code,stock_name,basic_df,path,nick="",save=1,show=1):
        s.save_plt(nick+code+stock_name,basic_df)
      if(show == 1):
        s.show_plt(stock_name,basic_df)
+     if s.value == Ture:
+       realtime_study(code,str(stock_name),path,show)
 
 def week_trend():
     print("start to week trend analyze stocks") 

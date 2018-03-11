@@ -45,6 +45,7 @@ class stock_study:
         self.period = period
         self.find_trend = False
         self.title_str = ""
+        self.value = False
         self.path = "pic"
 # -------------------------------------------------------------
 # initial the data frame and and if plot enable the plot will be intialled
@@ -91,6 +92,8 @@ class stock_study:
                      if self.df['close'][-1] < ma5[-1]:
                         print(" the stock "+str(self.code)+" is bear! ") ;
                         self.title_str = str(self.code)+" is bear! " 
+             if ma5[-1] < ma10[-1]:
+                     self.value = True 
              fig = plt.figure()
              fig.subplots_adjust(bottom=0.1)
              fig.subplots_adjust(hspace=0)
@@ -104,6 +107,9 @@ class stock_study:
              if ma5[-1] < ma10[-1]:
                 if(k_type == "60"):
                     print (" !!!!!!!!!!!!!!!!!  the stock "+str(self.code) + " ma is getting worse, please consider short the position !!!!!!") ;
+             if ma5[-1] > ma10[-1]:
+                if(k_type == "60"):
+                    print (" !!!!!!!!!!!!!!!!!  the stock "+str(self.code) + " ma is getting better , please consider long the position !!!!!!") ;
 
 
 
