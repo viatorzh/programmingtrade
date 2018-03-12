@@ -378,6 +378,8 @@ class stock_study:
 #        resp = urllib2.urlopen(stock_url)
 #        respHtml = resp.read()
 #        print("respHtml=",respHtml)
+    def return_valule(self):
+          return self.value 
 
     def check_ene(self):
         M1 = 9

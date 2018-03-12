@@ -190,7 +190,7 @@ def deep_study(code,stock_name,basic_df,path,nick="",save=1,show=1):
        s.save_plt(nick+code+stock_name,basic_df)
      if(show == 1):
        s.show_plt(stock_name,basic_df)
-     if s.value == Ture:
+     if s.return_valule == True:
        realtime_study(code,str(stock_name),path,show)
 
 def week_trend():
