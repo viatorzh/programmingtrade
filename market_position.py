@@ -33,7 +33,7 @@ def realtime_study(code,stock_name,path,save=1):
      if(str(code) == 'sh'):
        s = stock_study(code,200)
      else:
-       s = stock_study(code,130)
+       s = stock_study(code,40)
      s.initial_df(1,"60",path) 
      print (str(code)+" stock is under wave analysis for 60min k line") 
      if s.initial_extream_point(1): 
@@ -49,7 +49,7 @@ def realtime_study(code,stock_name,path,save=1):
      print (str(code)+" stock is plotting itself") 
      if(save == 1):
        s.save_plt(stock_name+"_1h",basic_df)
-#     s.show_plt(stock_name+"_1h",basic_df)
+     s.show_plt(stock_name+"_1h",basic_df)
 
 def deep_study(code,stock_name,path,save=1):
      if(str(code) == 'sh'):
@@ -71,7 +71,7 @@ def deep_study(code,stock_name,path,save=1):
      print (str(code)+" stock is plotting itself") 
      if(save == 1):
        s.save_plt(stock_name,basic_df)
-#     s.show_plt(stock_name,basic_df)
+     s.show_plt(stock_name,basic_df)
      return s.df['close'][-1] 
 
 
@@ -138,7 +138,7 @@ if __name__=="__main__":
              print ("!!!!!!!!!!!!!!!!"+str(stock_code)+" holding time exceed 30 days, please notice that !!!!!!!!!!!!!!!!!!!!!!!") 
            portfolios_arr[count,2] = delta.days
            realtime_study(stock_code,str(stock_name),path)
-           labels.append(stock_code)
+           labels.append(stock_code+str(stock_name))
            percentage.append(float(price)*float(amount))
         except:
            traceback.print_exc()
@@ -155,4 +155,5 @@ if __name__=="__main__":
      ax1.pie(percentage, explode=explode, labels=labels, autopct='%1.1f%%', shadow=True, startangle=90)
      ax1.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
 #     plt.show()
+     plt.title("totle market value is "+str(total_value))
      plt.savefig("portion_pie",c='k')

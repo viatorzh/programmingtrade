@@ -54,7 +54,10 @@ class stock_study:
         self.path = path ;
         now = datetime.datetime.now()
         # now.strftime('%Y-%m-%d')
-        delta = datetime.timedelta(days = self.period)
+        if(k_type == "60"):
+           delta = datetime.timedelta(days = self.period)/3
+        else:
+           delta = datetime.timedelta(days = self.period)
    #    delta = datetime.timedelta(days = 60)
         ndays = now - delta
         speriod = 5 
