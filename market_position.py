@@ -103,7 +103,7 @@ if __name__=="__main__":
      num = portfolios_arr.shape[0]
      deep_study('sh','上证综指',path)
      deep_study('sz','深证成指',path)
-     deep_study('zxb','中小板',path)
+     #deep_study('zxb','中小板',path)
      deep_study('cyb','创业板',path)
 #     f.open("portfolios_analysis.csv",'w')
      print ("classic stock is under deep parsing     ------------------") 
