@@ -166,7 +166,7 @@ def realtime_study(code,stock_name,path,save=1,show=1):
      s.macd_analysis(1)
      print (str(code)+" stock is plotting itself") 
      if(save == 1):
-       s.save_plt(stock_name+"_1h",basic_df)
+       s.save_plt("iv"+stock_name+"_1h",basic_df)
      if(show == 1):
        s.show_plt(stock_name+"_1h",basic_df)
 
