@@ -84,7 +84,7 @@ portfolios_monitor = ['600000','002185','002594','601633','603160','600663']
 portfolios_monitor = ['600000','002185','002594','601633','603160','600663']
 #tel = {'jack': 4098, 'sape': 4139}
 #portfolios = {'002185': 3100 ,'002635':1000 , '300059':2400, '300077':1200,'600487':300,'600663':400,'601633':4100}
-portfolios = [ ['002185',3100,'2017-12-10',7.951],['600597',1100,'2018-3-5',12.905],['300059',3500,'2017-12-30',14.289],['600663',400,'2017-11-8',20.003],['601633',3100,'2017-10-15',11.588],['600000',2100,'2018-3-5',12.603]]
+portfolios = [ ['002185',3100,'2018-2-10',7.951],['600597',1100,'2018-3-5',12.905],['300059',3300,'2017-12-30',13.761],['600663',400,'2017-11-8',20.003],['601633',5300,'2018-3-15',11.722],['600000',2100,'2018-3-5',12.603]]
 portfolios_arr = np.array(portfolios)
 
 #portfolios_finance = ['600030','600036','600109','601318','601328']
@@ -129,6 +129,7 @@ if __name__=="__main__":
 #           portfolios[stock_code] = price*amount 
            amount = (portfolios_arr[count,1])
            portfolios_arr[count,1] = float(price)*float(amount)
+           earning  = round((float(price) - cost)*float(amount),2)
            total_value = float(price)*float(amount) + total_value 
            total_cost = float(cost)*float(amount) + total_cost
            datestr = portfolios_arr[count,2]
@@ -138,7 +139,8 @@ if __name__=="__main__":
              print ("!!!!!!!!!!!!!!!!"+str(stock_code)+" holding time exceed 30 days, please notice that !!!!!!!!!!!!!!!!!!!!!!!") 
            portfolios_arr[count,2] = delta.days
            realtime_study(stock_code,str(stock_name),path)
-           labels.append(stock_code+str(stock_name))
+           labels.append(stock_code+" "+str(earning))
+           #labels.append(stock_code+str(stock_name)+" "+str(earning))
            percentage.append(float(price)*float(amount))
         except:
            traceback.print_exc()
@@ -154,6 +156,6 @@ if __name__=="__main__":
      fig1, ax1 = plt.subplots()
      ax1.pie(percentage, explode=explode, labels=labels, autopct='%1.1f%%', shadow=True, startangle=90)
      ax1.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
-#     plt.show()
      plt.title("totle market value is "+str(total_value))
      plt.savefig("portion_pie",c='k')
+     plt.show()
