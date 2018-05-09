@@ -84,7 +84,7 @@ portfolios_monitor = ['600000','002185','002594','601633','603160','600663']
 portfolios_monitor = ['600000','002185','002594','601633','603160','600663']
 #tel = {'jack': 4098, 'sape': 4139}
 #portfolios = {'002185': 3100 ,'002635':1000 , '300059':2400, '300077':1200,'600487':300,'600663':400,'601633':4100}
-portfolios = [ ['002185',3200,'2018-2-10',7.657],['600597',1100,'2018-3-5',12.905],['300059',3360,'2017-12-30',10.98],['600663',400,'2017-11-8',20.003],['601633',5300,'2018-3-15',11.722],['600000',2100,'2018-3-5',12.603]]
+portfolios = [['603160',200,'2018-5-8',77.12], ['002185',3200,'2018-2-10',7.657],['600597',1100,'2018-3-5',12.905],['300059',3360,'2017-12-30',10.98],['600663',400,'2017-11-8',20.003],['601633',5300,'2018-3-15',11.722],['600000',2100,'2018-3-5',12.603]]
 portfolios_arr = np.array(portfolios)
 
 #portfolios_finance = ['600030','600036','600109','601318','601328']
@@ -152,7 +152,7 @@ if __name__=="__main__":
      print (total_value)
      print (total_cost)
 #     percentage = percentage 
-     explode = (0, 0, 0, 0,0,0)  # only "explode" the 2nd slice (i.e. 'Hogs')
+     explode = (0, 0, 0, 0,0,0,0)  # only "explode" the 2nd slice (i.e. 'Hogs')
      fig1, ax1 = plt.subplots()
      ax1.pie(percentage, explode=explode, labels=labels, autopct='%1.1f%%', shadow=True, startangle=90)
      ax1.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
