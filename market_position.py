@@ -50,29 +50,62 @@ def realtime_study(code,stock_name,path,save=1):
      if(save == 1):
        s.save_plt(stock_name+"_1h",basic_df)
      s.show_plt(stock_name+"_1h",basic_df)
+     
+def deep_study_stock(code,stock_name,path,cost,save=1):
+     try: 
+       if(str(code) == 'sh'):
+         s = stock_study(code,200)
+       else:
+         s = stock_study(code,130)
+       s.initial_df(1,"D",path)
+       s.set_cost(cost)
+       print (str(code)+" stock is under wave analysis") 
+       if s.initial_extream_point(1): 
+         print (str(code)+" trend existed") 
+       if s.find_trend: 
+         print (str(code)+" trend found sub wave") 
+       s.plot_trend() 
+       print (str(code)+" stock is under macd analysis") 
+       s.check_ene()
+       s.macd_analysis(1)
+       if(s.check_kpattern == -1):
+          print ("!!!!!!!!!!!!!!!!"+str(code)+" stock k reversed should be cleared!!!!!!!!!!!!!!!!!!!!!!!") 
+       print (str(code)+" stock is plotting itself") 
+       if(save == 1):
+         s.save_plt(stock_name,basic_df)
+       s.show_plt(stock_name,basic_df)
+       return s.df['close'][-1] 
+     except:
+       traceback.print_exc()
+       pass
 
 def deep_study(code,stock_name,path,save=1):
-     if(str(code) == 'sh'):
-       s = stock_study(code,200)
-     else:
-       s = stock_study(code,130)
-     s.initial_df(1,"D",path) 
-     print (str(code)+" stock is under wave analysis") 
-     if s.initial_extream_point(1): 
-       print (str(code)+" trend existed") 
-     if s.find_trend: 
-       print (str(code)+" trend found sub wave") 
-     s.plot_trend() 
-     print (str(code)+" stock is under macd analysis") 
-     s.check_ene()
-     s.macd_analysis(1)
-     if(s.check_kpattern == -1):
-        print ("!!!!!!!!!!!!!!!!"+str(code)+" stock k reversed should be cleared!!!!!!!!!!!!!!!!!!!!!!!") 
-     print (str(code)+" stock is plotting itself") 
-     if(save == 1):
-       s.save_plt(stock_name,basic_df)
-     s.show_plt(stock_name,basic_df)
-     return s.df['close'][-1] 
+     try: 
+       if(str(code) == 'sh'):
+         s = stock_study(code,200)
+       else:
+         s = stock_study(code,130)
+       s.initial_df(1,"D",path) 
+       print (str(code)+" stock is under wave analysis") 
+       if s.initial_extream_point(1): 
+         print (str(code)+" trend existed") 
+       if s.find_trend: 
+         print (str(code)+" trend found sub wave") 
+       s.plot_trend() 
+       print (str(code)+" stock is under macd analysis") 
+       s.check_ene()
+       s.macd_analysis(1)
+       if(s.check_kpattern == -1):
+          print ("!!!!!!!!!!!!!!!!"+str(code)+" stock k reversed should be cleared!!!!!!!!!!!!!!!!!!!!!!!") 
+       print (str(code)+" stock is plotting itself") 
+       if(save == 1):
+         s.save_plt(stock_name,basic_df)
+       s.show_plt(stock_name,basic_df)
+       return s.df['close'][-1] 
+     except:
+       traceback.print_exc()
+       pass
+    
 
 
 portfolios_monitor = ['600895','002405','002594','300024','002230'      ,'601633',       '002185', '002456','300115','600016','600000','300059','600584']
@@ -84,7 +117,7 @@ portfolios_monitor = ['600000','002185','002594','601633','603160','600663']
 portfolios_monitor = ['600000','002185','002594','601633','603160','600663']
 #tel = {'jack': 4098, 'sape': 4139}
 #portfolios = {'002185': 3100 ,'002635':1000 , '300059':2400, '300077':1200,'600487':300,'600663':400,'601633':4100}
-portfolios = [['603160',200,'2018-5-8',77.12], ['002185',3200,'2018-2-10',7.657],['600597',1100,'2018-3-5',12.905],['300059',3360,'2017-12-30',10.98],['600663',400,'2017-11-8',20.003],['601633',5300,'2018-3-15',11.722],['600000',2100,'2018-3-5',12.603]]
+portfolios = [['603160',300,'2018-5-8',75.552], ['002185',11200,'2018-2-10',6.641],['600597',1100,'2018-3-5',12.905],['300059',5060,'2017-12-30',11.272],['600663',400,'2017-11-8',20.003],['601633',4000,'2018-3-15',11.85],['600000',3800,'2018-3-5',11.345],['000967',1200,'2018-3-6',8.514]]
 portfolios_arr = np.array(portfolios)
 
 #portfolios_finance = ['600030','600036','600109','601318','601328']
@@ -102,9 +135,9 @@ if __name__=="__main__":
      basic_df = ts.get_stock_basics()
      num = portfolios_arr.shape[0]
      deep_study('sh','上证综指',path)
-     deep_study('sz','深证成指',path)
+#     deep_study('sz','深证成指',path)
      #deep_study('zxb','中小板',path)
-     deep_study('cyb','创业板',path)
+#     deep_study('cyb','创业板',path)
 #     f.open("portfolios_analysis.csv",'w')
      print ("classic stock is under deep parsing     ------------------") 
 #     for stock_code in portfolios_monitor:
@@ -122,10 +155,11 @@ if __name__=="__main__":
      while count < num :
         try:
            stock_code = portfolios_arr[count,0]
-           stock_name = basic_df['name'][stock_code]
-           print (str(stock_code)+" stock is under deep parsing" + str(stock_name)) 
-           price = deep_study(stock_code,str(stock_name),path)
            cost = float(portfolios_arr[count,3])
+           stock_name = basic_df['name'][stock_code]
+           print (str(stock_code)+" stock is under deep parsing" + str(stock_name) +" cost is"+ str(cost)) 
+#           price = deep_study(stock_code,str(stock_name),path)
+           price = deep_study_stock(stock_code,str(stock_name),path,cost,1)
 #           portfolios[stock_code] = price*amount 
            amount = (portfolios_arr[count,1])
            portfolios_arr[count,1] = float(price)*float(amount)
@@ -152,7 +186,7 @@ if __name__=="__main__":
      print (total_value)
      print (total_cost)
 #     percentage = percentage 
-     explode = (0, 0, 0, 0,0,0,0)  # only "explode" the 2nd slice (i.e. 'Hogs')
+     explode = (0,0,0, 0, 0,0,0,0)  # only "explode" the 2nd slice (i.e. 'Hogs')
      fig1, ax1 = plt.subplots()
      ax1.pie(percentage, explode=explode, labels=labels, autopct='%1.1f%%', shadow=True, startangle=90)
      ax1.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.

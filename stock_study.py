@@ -47,6 +47,10 @@ class stock_study:
         self.title_str = ""
         self.value = False
         self.path = "pic"
+        self.cost = 0 
+
+    def set_cost(self,cost):
+        self.cost = cost ;
 # -------------------------------------------------------------
 # initial the data frame and and if plot enable the plot will be intialled
 # -------------------------------------------------------------
@@ -207,6 +211,9 @@ class stock_study:
             self.ax0.plot([self.df['close'][:minidx].count(),self.df['close'].count()],[self.df['close'][maxidx]-price_diff*0.618,self.df['close'][maxidx]-price_diff*0.618],'b--') ;
             self.ax0.plot([self.df['close'][:minidx].count(),self.df['close'].count()],[self.df['close'][maxidx]-price_diff*0.382,self.df['close'][maxidx]-price_diff*0.382],'b--') ;
             self.ax0.plot([self.df['close'][:minidx].count(),self.df['close'][:maxidx].count()],[self.df['close'][minidx],self.df['close'][maxidx]],'r-') 
+            if self.cost != 0:
+               self.ax0.plot([self.df['close'][:minidx].count(),self.df['close'].count()],[self.cost,self.cost],'g-') ;
+
          
          self.maxidx = maxidx 
          self.minidx = minidx 
